@@ -1,213 +1,360 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>24点计算小游戏</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            line-height: 1.6;
-        }
-        .container {
-            background-color: #f5f5f5;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: #333;
-            text-align: center;
-        }
-        .input-group {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin: 20px 0;
-        }
-        input {
-            width: 60px;
-            height: 40px;
-            text-align: center;
-            font-size: 18px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-        button {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            text-align: center;
-            text-decoration: none;
-            display: block;
-            font-size: 16px;
-            margin: 20px auto;
-            cursor: pointer;
-            border-radius: 4px;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-        #result {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #e9f7ef;
-            border-radius: 4px;
-            min-height: 50px;
-        }
-        .error {
-            color: red;
-            margin-top: 10px;
-        }
-        .solution {
-            margin: 5px 0;
-            padding: 8px;
-            background-color: #fff;
-            border-radius: 4px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>24点计算器 | 趣味数学游戏</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  
+  <!-- 配置Tailwind自定义主题 -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#3B82F6', // 蓝色作为主色调，代表计算与逻辑
+            secondary: '#F97316', // 橙色作为辅助色，用于强调和交互元素
+            neutral: {
+              100: '#F3F4F6',
+              200: '#E5E7EB',
+              700: '#374151',
+              800: '#1F2937',
+              900: '#111827'
+            }
+          },
+          fontFamily: {
+            inter: ['Inter', 'system-ui', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .input-focus {
+        @apply focus:ring-2 focus:ring-primary/50 focus:border-primary focus:outline-none;
+      }
+      .btn-hover {
+        @apply hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300;
+      }
+      .card-effect {
+        @apply bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300;
+      }
+    }
+  </style>
+  
+  <!-- 引入Google字体 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
-<body>
-    <div class="container">
-        <h1>24点计算小游戏</h1>
-        <p>请输入4个1-13的数字，系统将计算出能够组成24点的算式：</p>
+
+<body class="font-inter bg-gradient-to-br from-neutral-100 to-neutral-200 min-h-screen text-neutral-800">
+  <div class="container mx-auto px-4 py-8 max-w-4xl">
+    <!-- 标题区域 -->
+    <header class="text-center mb-10">
+      <h1 class="text-[clamp(2rem,5vw,3rem)] font-bold text-neutral-800 mb-2 relative inline-block">
+        24点计算器
+        <span class="absolute -bottom-2 left-0 w-full h-1 bg-gradient-to-r from-primary to-secondary rounded-full"></span>
+      </h1>
+      <p class="text-neutral-700 text-lg mt-4">输入4个数字，计算所有能得到24点的解法</p>
+    </header>
+    
+    <!-- 主内容区 -->
+    <main class="bg-white rounded-2xl shadow-xl overflow-hidden">
+      <!-- 输入区域 -->
+      <section class="p-6 md:p-8 border-b border-neutral-200">
+        <h2 class="text-xl font-semibold mb-6 flex items-center">
+          <<i class="fa fa-keyboard-o text-primary mr-2"></</i>输入数字
+        </h2>
         
-        <div class="input-group">
-            <input type="number" id="num1" min="1" max="13" placeholder="数字1">
-            <input type="number" id="num2" min="1" max="13" placeholder="数字2">
-            <input type="number" id="num3" min="1" max="13" placeholder="数字3">
-            <input type="number" id="num4" min="1" max="13" placeholder="数字4">
+        <div class="flex flex-wrap gap-4 justify-center mb-6">
+          <!-- 四个数字输入框 -->
+          <div class="w-20 h-20 relative">
+            <input type="number" min="1" max="13" value="1" 
+                  class="w-full h-full rounded-xl border-2 border-neutral-200 text-center text-2xl font-bold input-focus transition-all duration-300"
+                  id="num1">
+            <span class="absolute -top-1 -right-1 bg-primary text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">1</span>
+          </div>
+          
+          <div class="w-20 h-20 relative">
+            <input type="number" min="1" max="13" value="2" 
+                  class="w-full h-full rounded-xl border-2 border-neutral-200 text-center text-2xl font-bold input-focus transition-all duration-300"
+                  id="num2">
+            <span class="absolute -top-1 -right-1 bg-primary text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">2</span>
+          </div>
+          
+          <div class="w-20 h-20 relative">
+            <input type="number" min="1" max="13" value="3" 
+                  class="w-full h-full rounded-xl border-2 border-neutral-200 text-center text-2xl font-bold input-focus transition-all duration-300"
+                  id="num3">
+            <span class="absolute -top-1 -right-1 bg-primary text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">3</span>
+          </div>
+          
+          <div class="w-20 h-20 relative">
+            <input type="number" min="1" max="13" value="4" 
+                  class="w-full h-full rounded-xl border-2 border-neutral-200 text-center text-2xl font-bold input-focus transition-all duration-300"
+                  id="num4">
+            <span class="absolute -top-1 -right-1 bg-primary text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">4</span>
+          </div>
         </div>
         
-        <button onclick="calculate24()">计算24点</button>
+        <div class="flex flex-wrap gap-4 justify-center">
+          <button id="randomBtn" class="px-6 py-3 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 rounded-lg font-medium transition-all duration-300 flex items-center btn-hover">
+            <<i class="fa fa-random mr-2"></</i>随机生成
+          </button>
+          
+          <button id="calculateBtn" class="px-8 py-3 bg-secondary hover:bg-secondary/90 text-white rounded-lg font-medium transition-all duration-300 flex items-center btn-hover">
+            <<i class="fa fa-calculator mr-2"></</i>计算24点
+          </button>
+        </div>
+      </section>
+      
+      <!-- 结果展示区域 -->
+      <section class="p-6 md:p-8">
+        <h2 class="text-xl font-semibold mb-6 flex items-center">
+          <<i class="fa fa-lightbulb-o text-secondary mr-2"></</i>计算结果
+        </h2>
         
-        <div id="error" class="error"></div>
-        
-        <div id="result"></div>
-    </div>
+        <div id="resultContainer" class="min-h-[120px] flex items-center justify-center">
+          <div class="text-center text-neutral-500" id="initialMessage">
+            <<i class="fa fa-info-circle text-2xl mb-2 block"></</i>
+            <p>点击计算按钮开始寻找解法...</p>
+          </div>
+          
+          <div id="loadingIndicator" class="hidden text-center">
+            <div class="inline-block w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+            <p class="mt-2 text-neutral-600">正在计算可能的解法...</p>
+          </div>
+          
+          <div id="results" class="w-full hidden">
+            <h3 class="text-lg font-medium mb-3" id="resultCount"></h3>
+            <div id="solutions" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+          </div>
+          
+          <div id="noSolution" class="hidden text-center text-neutral-600">
+            <<i class="fa fa-times-circle text-red-500 text-2xl mb-2 block"></</i>
+            <p>没有找到能得到24点的解法</p>
+          </div>
+        </div>
+      </section>
+    </main>
+    
+    <!-- 游戏说明 -->
+    <section class="mt-8 bg-white rounded-xl shadow-lg p-6">
+      <h3 class="text-lg font-semibold mb-3 flex items-center">
+        <<i class="fa fa-book text-primary mr-2"></</i>游戏规则
+      </h3>
+      <p class="text-neutral-700 text-sm">
+        24点是一种数学游戏，目标是使用4个数字，通过加减乘除四种运算，以及括号改变运算顺序，使得最终结果为24。
+        每个数字必须且只能使用一次。本计算器会找出所有可能的解法。
+      </p>
+    </section>
+    
+    <!-- 页脚 -->
+    <footer class="mt-10 text-center text-neutral-500 text-sm">
+      <p>© 2023 24点计算器 | 用数学点亮思维</p>
+    </footer>
+  </div>
 
-    <script>
-        function calculate24() {
-            // 获取输入的数字
-            const num1 = parseInt(document.getElementById('num1').value);
-            const num2 = parseInt(document.getElementById('num2').value);
-            const num3 = parseInt(document.getElementById('num3').value);
-            const num4 = parseInt(document.getElementById('num4').value);
+  <script>
+    // 等待DOM加载完成
+    document.addEventListener('DOMContentLoaded', () => {
+      // 获取DOM元素
+      const numInputs = [
+        document.getElementById('num1'),
+        document.getElementById('num2'),
+        document.getElementById('num3'),
+        document.getElementById('num4')
+      ];
+      const randomBtn = document.getElementById('randomBtn');
+      const calculateBtn = document.getElementById('calculateBtn');
+      const initialMessage = document.getElementById('initialMessage');
+      const loadingIndicator = document.getElementById('loadingIndicator');
+      const results = document.getElementById('results');
+      const resultCount = document.getElementById('resultCount');
+      const solutions = document.getElementById('solutions');
+      const noSolution = document.getElementById('noSolution');
+      
+      // 随机生成四个1-13的数字
+      randomBtn.addEventListener('click', () => {
+        numInputs.forEach(input => {
+          input.value = Math.floor(Math.random() * 13) + 1;
+          // 添加输入变化动画
+          input.classList.add('scale-110');
+          setTimeout(() => input.classList.remove('scale-110'), 200);
+        });
+      });
+      
+      // 计算按钮点击事件
+      calculateBtn.addEventListener('click', calculate24);
+      
+      // 为输入框添加回车键触发计算的功能
+      numInputs.forEach(input => {
+        input.addEventListener('keyup', (e) => {
+          if (e.key === 'Enter') {
+            calculate24();
+          }
+        });
+      });
+      
+      // 计算24点的主函数
+      function calculate24() {
+        // 验证输入
+        const numbers = numInputs.map(input => {
+          const val = parseInt(input.value, 10);
+          // 确保输入是1-13之间的有效数字
+          if (isNaN(val) || val < 1 || val > 13) {
+            input.value = Math.floor(Math.random() * 13) + 1;
+            return parseInt(input.value, 10);
+          }
+          return val;
+        });
+        
+        // 显示加载状态
+        initialMessage.classList.add('hidden');
+        results.classList.add('hidden');
+        noSolution.classList.add('hidden');
+        loadingIndicator.classList.remove('hidden');
+        
+        // 使用setTimeout模拟计算过程，避免UI阻塞
+        setTimeout(() => {
+          const solutionsList = find24Solutions(numbers);
+          
+          // 隐藏加载状态
+          loadingIndicator.classList.add('hidden');
+          
+          // 显示结果
+          if (solutionsList.length > 0) {
+            resultCount.textContent = `找到 ${solutionsList.length} 种解法：`;
+            solutions.innerHTML = '';
             
-            // 清空错误和结果
-            document.getElementById('error').textContent = '';
-            document.getElementById('result').innerHTML = '';
+            // 添加每个解法
+            solutionsList.forEach((solution, index) => {
+              const solutionEl = document.createElement('div');
+              solutionEl.className = 'bg-neutral-50 rounded-lg p-3 border border-neutral-200 text-neutral-800 transition-all duration-300 hover:shadow-md';
+              solutionEl.innerHTML = `<span class="inline-block w-6 h-6 rounded-full bg-primary/10 text-primary text-sm font-medium text-center leading-6 mr-2">${index + 1}</span>${solution}`;
+              solutions.appendChild(solutionEl);
+              
+              // 添加渐入动画
+              setTimeout(() => {
+                solutionEl.style.opacity = '1';
+                solutionEl.style.transform = 'translateY(0)';
+              }, 50 * index);
+            });
             
-            // 验证输入
-            const numbers = [num1, num2, num3, num4];
-            for (let i = 0; i < numbers.length; i++) {
-                if (isNaN(numbers[i]) || numbers[i] < 1 || numbers[i] > 13) {
-                    document.getElementById('error').textContent = '请输入4个1-13的有效数字！';
-                    return;
-                }
+            results.classList.remove('hidden');
+          } else {
+            noSolution.classList.remove('hidden');
+          }
+        }, 300); // 短暂延迟，让加载动画有展示时间
+      }
+      
+      // 生成所有可能的数字排列（去重）
+      function permuteUnique(arr) {
+        const result = [];
+        arr.sort((a, b) => a - b);
+        
+        const permute = (current, remaining) => {
+          if (remaining.length === 0) {
+            result.push([...current]);
+            return;
+          }
+          
+          for (let i = 0; i < remaining.length; i++) {
+            // 跳过重复元素
+            if (i > 0 && remaining[i] === remaining[i - 1]) continue;
+            current.push(remaining[i]);
+            permute(current, [...remaining.slice(0, i), ...remaining.slice(i + 1)]);
+            current.pop();
+          }
+        };
+        
+        permute([], arr);
+        return result;
+      }
+      
+      // 生成所有可能的运算符组合
+      function generateOperators() {
+        const ops = ['+', '-', '*', '/'];
+        const result = [];
+        
+        for (let i = 0; i < ops.length; i++) {
+          for (let j = 0; j < ops.length; j++) {
+            for (let k = 0; k < ops.length; k++) {
+              result.push([ops[i], ops[j], ops[k]]);
             }
-            
-            // 计算24点
-            const solutions = solve24(numbers);
-            
-            // 显示结果
-            const resultDiv = document.getElementById('result');
-            if (solutions.length === 0) {
-                resultDiv.textContent = '无法用这些数字组成24点。';
-            } else {
-                resultDiv.innerHTML = '<h3>可能的解法：</h3>';
-                // 只显示前10个解法以避免过多
-                const maxDisplay = Math.min(solutions.length, 10);
-                for (let i = 0; i < maxDisplay; i++) {
-                    const solutionDiv = document.createElement('div');
-                    solutionDiv.className = 'solution';
-                    solutionDiv.textContent = solutions[i];
-                    resultDiv.appendChild(solutionDiv);
-                }
-                if (solutions.length > 10) {
-                    resultDiv.innerHTML += `<p>... 共找到 ${solutions.length} 种解法，显示前10种</p>`;
-                }
-            }
+          }
         }
         
-        // 24点计算核心算法
-        function solve24(numbers) {
-            const solutions = [];
-            const ops = ['+', '-', '*', '/'];
+        return result;
+      }
+      
+      // 计算表达式的值（考虑运算符优先级和括号）
+      function evaluateExpression(expr) {
+        try {
+          // 使用Function构造函数安全地计算表达式
+          return new Function(`return ${expr};`)();
+        } catch (e) {
+          return NaN;
+        }
+      }
+      
+      // 寻找所有能得到24的解法
+      function find24Solutions(numbers) {
+        const uniquePermutations = permuteUnique(numbers);
+        const operatorsList = generateOperators();
+        const solutions = new Set(); // 使用Set去重
+        
+        // 遍历所有数字排列
+        uniquePermutations.forEach(nums => {
+          const [a, b, c, d] = nums;
+          
+          // 遍历所有运算符组合
+          operatorsList.forEach(ops => {
+            const [op1, op2, op3] = ops;
             
-            // 递归函数，尝试所有可能的组合
-            function calculate(nums, exp) {
-                if (nums.length === 1) {
-                    if (Math.abs(nums[0] - 24) < 0.0001) { // 处理浮点数精度问题
-                        solutions.push(exp[0]);
-                    }
-                    return;
-                }
-                
-                for (let i = 0; i < nums.length; i++) {
-                    for (let j = 0; j < nums.length; j++) {
-                        if (i === j) continue;
-                        
-                        const newNums = [];
-                        const newExp = [];
-                        
-                        for (let k = 0; k < nums.length; k++) {
-                            if (k !== i && k !== j) {
-                                newNums.push(nums[k]);
-                                newExp.push(exp[k]);
-                            }
-                        }
-                        
-                        for (const op of ops) {
-                            // 跳过除数为0的情况
-                            if (op === '/' && nums[j] === 0) continue;
-                            
-                            let result;
-                            switch (op) {
-                                case '+': result = nums[i] + nums[j]; break;
-                                case '-': result = nums[i] - nums[j]; break;
-                                case '*': result = nums[i] * nums[j]; break;
-                                case '/': result = nums[i] / nums[j]; break;
-                            }
-                            
-                            // 根据运算符优先级决定是否加括号
-                            let newE;
-                            const expI = exp[i];
-                            const expJ = exp[j];
-                            
-                            if (op === '+' || op === '-') {
-                                // 如果子表达式是乘法或除法，不需要括号
-                                const needParenI = expI.includes('+') || expI.includes('-');
-                                const needParenJ = expJ.includes('+') || expJ.includes('-');
-                                
-                                newE = (needParenI ? `(${expI})` : expI) + op + 
-                                       (needParenJ ? `(${expJ})` : expJ);
-                            } else {
-                                newE = expI + op + expJ;
-                            }
-                            
-                            newNums.push(result);
-                            newExp.push(newE);
-                            
-                            calculate(newNums, newExp);
-                            
-                            newNums.pop();
-                            newExp.pop();
-                        }
-                    }
-                }
+            // 情况1: ((a op1 b) op2 c) op3 d
+            const expr1 = `(((${a} ${op1} ${b}) ${op2} ${c}) ${op3} ${d})`;
+            if (Math.abs(evaluateExpression(expr1) - 24) < 0.001) {
+              solutions.add(expr1.replace(/\(\(([^)]+)\)\)/g, '($1)') + ' = 24');
             }
             
-            // 初始调用，每个数字作为字符串表达式
-            calculate(numbers, numbers.map(num => num.toString()));
+            // 情况2: (a op1 (b op2 c)) op3 d
+            const expr2 = `(((${a} ${op1} (${b} ${op2} ${c})) ${op3} ${d})`;
+            if (Math.abs(evaluateExpression(expr2) - 24) < 0.001) {
+              solutions.add(expr2.replace(/\(\(([^)]+)\)\)/g, '($1)') + ' = 24');
+            }
             
-            // 去重
-            return [...new Set(solutions)];
-        }
-    </script>
+            // 情况3: a op1 ((b op2 c) op3 d)
+            const expr3 = `${a} ${op1} (((${b} ${op2} ${c}) ${op3} ${d}))`;
+            if (Math.abs(evaluateExpression(expr3) - 24) < 0.001) {
+              solutions.add(expr3.replace(/\(\(([^)]+)\)\)/g, '($1)') + ' = 24');
+            }
+            
+            // 情况4: a op1 (b op2 (c op3 d))
+            const expr4 = `${a} ${op1} (${b} ${op2} (${c} ${op3} ${d}))`;
+            if (Math.abs(evaluateExpression(expr4) - 24) < 0.001) {
+              solutions.add(expr4 + ' = 24');
+            }
+            
+            // 情况5: (a op1 b) op2 (c op3 d)
+            const expr5 = `((${a} ${op1} ${b}) ${op2} (${c} ${op3} ${d}))`;
+            if (Math.abs(evaluateExpression(expr5) - 24) < 0.001) {
+              solutions.add(expr5 + ' = 24');
+            }
+          });
+        });
+        
+        // 转换为数组并返回
+        return Array.from(solutions);
+      }
+    });
+  </script>
 </body>
 </html>
